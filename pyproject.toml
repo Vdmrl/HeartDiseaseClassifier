@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "heartdiseasedetector"
+version = "0.1.0"
+description = "Web-Applications for Auscultation Data Analysis using Audio Spectrogram Transformer, fastapi, rabbitmq, postgresql and Streamlit"
+authors = ["Vdmrl <vvluzin2004@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.11"
+streamlit = "^1.43.0"
+transformers = "^4.49.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
