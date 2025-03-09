@@ -112,3 +112,5 @@ outputs/
 .vscode/
 .idea/
 __MACOSX/
+
+.env.prod
