@@ -4,7 +4,9 @@ import requests
 from streamlit_advanced_audio import WaveSurferOptions, audix
 from pydub import AudioSegment
 
-# set target frame rate
+from logger import logger
+
+# Set target frame rate
 FRAME_RATE = 16000
 
 st.title("Heart Disease Classifier")
@@ -18,19 +20,23 @@ uploaded_file = st.file_uploader(
 )
 
 if uploaded_file is not None:
+    logger.info("File uploaded", extra={"file_name": uploaded_file.name})
     try:
         # Reset pointer and determine file format
         uploaded_file.seek(0)
         file_format = uploaded_file.name.split('.')[-1]
         # Load audio with pydub
         audio = AudioSegment.from_file(uploaded_file, format=file_format)
+        logger.info("Audio file loaded successfully", extra={"format": file_format})
     except Exception as e:
+        logger.exception("Error reading the audio file")
         st.error("Error reading the audio file: " + str(e))
         audio = None
 
     if audio is not None:
         # Resample if needed
         if audio.frame_rate != FRAME_RATE:
+            logger.info("Resampling audio", extra={"original_frame_rate": audio.frame_rate, "target_frame_rate": FRAME_RATE})
             audio = audio.set_frame_rate(FRAME_RATE)
 
         # Export the (possibly resampled) audio into an in-memory buffer
@@ -45,37 +51,43 @@ if uploaded_file is not None:
                 wave_color="#e17055", cursor_color="#d63031"
             ),
         )
-        if result and "selectedRegion" in result.keys():
+        if result and "selectedRegion" in result and result["selectedRegion"]:
             # Assume result returns start and end times in seconds
             start = result["selectedRegion"].get("start", 0)
             end = result["selectedRegion"].get("end", 0)
             duration = end - start
+            logger.info("Audio crop selected", extra={"start": start, "end": end, "duration": duration})
 
             # If the user selects more than 10 seconds, limit to the first 10 seconds.
             if duration > 10:
                 st.warning("Selection is longer than 10 seconds. Limiting to the first 10 seconds.")
+                logger.warning("Selection longer than 10 seconds; limiting to 10 seconds", extra={"original_duration": duration})
                 end = start + 10
                 duration = 10
+
+            # Crop the audio (pydub works in milliseconds)
+            cropped_audio = audio[start * 1000: end * 1000]
+
+            # Export cropped audio to a BytesIO buffer
+            cropped_buffer = io.BytesIO()
+            cropped_audio.export(cropped_buffer, format="wav")
+            cropped_buffer.seek(0)
+
+            # Send the cropped result to the backend only if its duration is less than 10 seconds.
+            if duration < 10:
+                files = {"audio": ("cropped.wav", cropped_buffer, "audio/wav")}
+                try:
+                    logger.info("Sending cropped audio to backend", extra={"duration": duration})
+                    response = requests.post("http://backend:8000/detector/get_audio_class", files=files)
+                    logger.info("Received response from backend", extra={"status_code": response.status_code, "response_text": response.text})
+                    if response.ok:
+                        result_str = response.text
+                        st.write("Detected Audio Class:", result_str)
+                    else:
+                        st.error("Backend error: " + response.text)
+                        logger.error("Backend returned an error", extra={"status_code": response.status_code, "response_text": response.text})
+                except Exception as e:
+                    st.error("Error sending request to backend: " + str(e))
+                    logger.exception("Exception while sending request to backend")
             else:
-                # Crop the audio (pydub works in milliseconds)
-                cropped_audio = audio[start * 1000: end * 1000]
-
-                # Export cropped audio to a BytesIO buffer
-                cropped_buffer = io.BytesIO()
-                cropped_audio.export(cropped_buffer, format="wav")
-                cropped_buffer.seek(0)
-
-                # Send the cropped result to the backend only if its duration is less than 10 seconds.
-                if duration < 10:
-                    files = {"file": ("cropped.wav", cropped_buffer, "audio/wav")}
-                    try:
-                        response = requests.post("http://backend:8000/detector/get_audio_class", files=files)
-                        if response.ok:
-                            result_str = response.text
-                            st.write("Detected Audio Class:", result_str)
-                        else:
-                            st.error("Backend error: " + response.text)
-                    except Exception as e:
-                        st.error("Error sending request to backend: " + str(e))
-                else:
-                    st.info("Cropped audio is 10 seconds long and was not sent to the backend.")
+                st.info("Cropped audio is 10 seconds long and was not sent to the backend.")

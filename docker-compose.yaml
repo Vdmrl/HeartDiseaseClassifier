@@ -1,16 +1,45 @@
-version: "3.7"
+version: "3.8"
 services:
-  db: # in production replace db service with real database and models with reflection
-    image: postgresql
-    container_name: db_app
-    restart: always
-    environment:
-      - MYSQL_ROOT_PASSWORD=secret
-      - MYSQL_DATABASE=startupsupport
+  frontend:
+    build: frontend
     ports:
-      - "5400:8000"
-    expose:
-      - "8000"
+      - 8501:8501
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+    restart: always
+    networks:
+      - app
+    container_name: frontend
+
+  backend:
+    build: backend
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend:/app
+    env_file:
+      - .env.prod
+    restart: always
+    networks:
+      - app
+    container_name: backend
+    depends_on:
+      - redis
+    #  - "db"
+
+  #db: # in production replace db service with real database and models with reflection
+  #  image: postgresql
+  #  container_name: db_app
+  #  restart: always
+  #  environment:
+  #    - MYSQL_ROOT_PASSWORD=secret
+  #    - MYSQL_DATABASE=startupsupport
+  #  ports:
+  #    - "5400:8000"
+  #  expose:
+  #    - "8000"
 
   redis:
     image: redis:alpine
@@ -19,36 +48,30 @@ services:
     ports:
       - "6379:6379"
 
-  prometheus:
-    image: prom/prometheus:v2.53.0
-    container_name: prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheusdata:/prometheus
-    restart: unless-stopped
-    ports:
-      - 9090:9090
+  # prometheus:
+  #   image: prom/prometheus:v2.53.0
+  #   container_name: prometheus
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - prometheusdata:/prometheus
+  #   restart: unless-stopped
+  #   ports:
+  #     - 9090:9090
 
-  grafana:
-    image: grafana/grafana:9.4.7
-    container_name: grafana
-    volumes:
-      - grafanadata:/var/lib/grafana
-    restart: unless-stopped
-    ports:
-      - 3000:3000
+  # grafana:
+  #   image: grafana/grafana:9.4.7
+  #   container_name: grafana
+  #   volumes:
+  #     - grafanadata:/var/lib/grafana
+  #   restart: unless-stopped
+  #   ports:
+  #     - 3000:3000
 
+networks:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: fastapi_app
-    environment:
-      - ENV_FILE=.env.prod
-    depends_on:
-      - "db"
-    ports:
-      - 8000:8000
-volumes:
-  grafanadata:
-  prometheusdata:
+    driver: bridge
+
+#volumes:
+#  grafanadata:
+#  prometheusdata:
+

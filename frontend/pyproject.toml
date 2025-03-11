@@ -13,6 +13,7 @@ streamlit-advanced-audio = "^0.1.1"
 ffmpeg = "^1.4"
 pydub = "^0.25.1"
 ffprobe = "^0.5"
+python-json-logger = "^3.3.0"
 
 
 [build-system]

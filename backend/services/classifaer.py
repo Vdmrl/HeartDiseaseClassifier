@@ -1,5 +1,5 @@
-import base64
 import io
+import logging
 import numpy as np
 import torch
 import librosa
@@ -9,23 +9,36 @@ MODEL_CHECKPOINT = "Vladimirlv/ast-finetuned-audioset-10-10-0.4593-heart-sounds"
 TIME_LIMIT_SECONDS = 10
 SAMPLE_RATE = 16000
 
+# Configure logging for this module
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
 class Classifier:
     """
-        A classifier for audio files using a pretrained audio classification model.
+    A classifier for audio files using a pretrained audio classification model.
 
-        This class decodes a base64-encoded audio string, preprocesses the audio
-        to ensure a fixed length, extracts features using a pretrained feature extractor,
-        and performs classification with a pretrained audio classification model.
+    This class handles the preprocessing of raw audio bytes, extraction of audio features
+    using a pretrained feature extractor, and audio classification using a pretrained model.
+    The model expects the audio input to be of a fixed length defined by the sample rate
+    and a time limit (default: 10 seconds).
     """
 
     def __init__(self):
         """
-            Initialize the Classifier with a pretrained feature extractor and model.
+        Initialize the Classifier with a pretrained feature extractor and model.
 
-            The model is set to evaluation mode. The target length for audio is defined
-            based on the sample rate and time limit (10 seconds).
+        Loads the model and feature extractor from the specified checkpoint, sets the model
+        to evaluation mode, and defines the target length for audio based on the sample rate
+        and time limit.
         """
+        logger.info("Initializing classifier with model checkpoint: %s", MODEL_CHECKPOINT)
         self.extractor = AutoFeatureExtractor.from_pretrained(
             MODEL_CHECKPOINT,
             do_normalize=True,
@@ -41,54 +54,59 @@ class Classifier:
 
     def preprocess_audio(self, audio_bytes: bytes) -> np.ndarray:
         """
-            Preprocess audio file bytes.
+        Preprocess raw audio bytes into a numpy array of fixed length.
 
-            This method reads the audio from bytes using librosa with the specified
-            sample rate and ensures that the resulting audio array is exactly the
-            target length by padding or truncating as necessary.
+        The audio is loaded using librosa with the specified sample rate. If the audio is
+        shorter than the target length, it is padded with zeros; if it is longer, it is truncated.
 
-            Parameters:
-                audio_bytes (bytes): Raw audio file bytes.
+        Parameters:
+            audio_bytes (bytes): Raw audio file bytes.
 
-            Returns:
-                np.ndarray: A numpy array representing the preprocessed audio waveform.
+        Returns:
+            np.ndarray: A numpy array representing the preprocessed audio waveform.
         """
+        logger.info("Preprocessing audio")
         audio_buffer = io.BytesIO(audio_bytes)
         audio_array, sr = librosa.load(audio_buffer, sr=self.sample_rate)
+        logger.info("Audio loaded: sample rate %s, length %s", sr, len(audio_array))
         # Pad or truncate the audio to have a fixed length
         if len(audio_array) < self.target_length:
+            logger.info("Padding audio from length %s to target length %s", len(audio_array), self.target_length)
             audio_array = np.pad(audio_array, (0, self.target_length - len(audio_array)), mode='constant')
         else:
+            logger.info("Truncating audio from length %s to target length %s", len(audio_array), self.target_length)
             audio_array = audio_array[:self.target_length]
         return audio_array
 
-    def classify_audio(self, audio_base64: str):
+    def classify_audio(self, audio_bytes: bytes) -> str:
         """
-            Classify audio from a base64-encoded string.
+        Classify audio from raw file bytes.
 
-            This method preprocesses the audio, extracts features using the pretrained feature extractor,
-            performs inference with the pretrained audio classification model, and returns the predicted class label.
+        The method preprocesses the input audio bytes, extracts features using the pretrained
+        feature extractor, performs inference with the pretrained audio classification model, and
+        returns the predicted class label.
 
-            Parameters:
-                audio_base64 (str): Base64 encoded audio data.
+        Parameters:
+            audio_bytes (bytes): Raw audio file bytes.
 
-            Returns:
-                str: The predicted class label.
+        Returns:
+            str: The predicted class label.
         """
-        # Preprocess the audio from the base64 string
-        audio_array = self.preprocess_audio(audio_base64)
-        # Extract features without truncation, as we fixed the length manually
+        logger.info("Starting audio classification")
+        # Preprocess the audio from the file bytes
+        audio_array = self.preprocess_audio(audio_bytes)
+        logger.info("Audio preprocessed, extracting features")
         inputs = self.extractor(
             audio_array,
             sampling_rate=self.sample_rate,
             truncation=False,
             return_tensors="pt"
         )
-        # Run inference
+        # Run inference without gradient calculations
         with torch.no_grad():
             outputs = self.model(**inputs)
-        # Select the class with the highest logit
         logits = outputs.logits
         predicted_class_id = logits.argmax(-1).item()
         predicted_label = self.model.config.id2label[predicted_class_id]
+        logger.info("Audio classified successfully", extra={"class": predicted_label})
         return predicted_label

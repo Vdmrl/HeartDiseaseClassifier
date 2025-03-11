@@ -17,6 +17,10 @@ pydantic-settings = "^2.8.1"
 fastapi-cache2 = "^0.2.2"
 numpy = "<2.0"
 python-multipart = "^0.0.20"
+gunicorn = "^23.0.0"
+python-json-logger = "^3.3.0"
+torch = "^2.6.0"
+librosa = "^0.10.2.post1"
 
 
 [build-system]
