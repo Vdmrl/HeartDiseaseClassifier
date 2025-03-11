@@ -4,25 +4,26 @@
 
 The Heart Disease Detector is a web application that utilizes a trained AST transformer for classifying heart auscultation sounds, enabling early detection of heart conditions. Built with FastAPI, Streamlit, RabbitMQ, and PostgreSQL, it provides an efficient and interactive platform for healthcare professionals.
 
-### Using python virtual machine
+## Preparing environment and docker
 
-1. Create a [Python virtual environment](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) and activate it.
++ Change .env.example name to .env.prod
 
-2. Install requirements:
++ Change .env.prod data to your configuration
 
-    ```shell
-    python3 -m pip install --user -r requirements.txt
-    ```
-   
-3. Run pytest
-    ```shell
-    pytest
-    ```
+## Running server
 
-4. Run server using gunicorn:
+### Using Docker compose
+
++ Run services
 
     ```shell
-    uvicorn main:app --reload
+    docker-compose up
     ```
 
-go to the local host address: http://127.0.0.1:8000/
++ Bring services down
+
+    ```shell
+    docker-compose down
+    ```
+
+go to the local host address: http://127.0.0.1:8501/
