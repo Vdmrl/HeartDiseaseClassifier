@@ -27,3 +27,5 @@ The Heart Disease Detector is a web application that utilizes a trained AST tran
     ```
 
 go to the local host address: http://127.0.0.1:8501/
+
+for backend documentation: http://127.0.0.1:8000/docs 

@@ -36,7 +36,8 @@ if uploaded_file is not None:
     if audio is not None:
         # Resample if needed
         if audio.frame_rate != FRAME_RATE:
-            logger.info("Resampling audio", extra={"original_frame_rate": audio.frame_rate, "target_frame_rate": FRAME_RATE})
+            logger.info("Resampling audio",
+                        extra={"original_frame_rate": audio.frame_rate, "target_frame_rate": FRAME_RATE})
             audio = audio.set_frame_rate(FRAME_RATE)
 
         # Export the (possibly resampled) audio into an in-memory buffer
@@ -58,13 +59,6 @@ if uploaded_file is not None:
             duration = end - start
             logger.info("Audio crop selected", extra={"start": start, "end": end, "duration": duration})
 
-            # If the user selects more than 10 seconds, limit to the first 10 seconds.
-            if duration > 10:
-                st.warning("Selection is longer than 10 seconds. Limiting to the first 10 seconds.")
-                logger.warning("Selection longer than 10 seconds; limiting to 10 seconds", extra={"original_duration": duration})
-                end = start + 10
-                duration = 10
-
             # Crop the audio (pydub works in milliseconds)
             cropped_audio = audio[start * 1000: end * 1000]
 
@@ -73,21 +67,34 @@ if uploaded_file is not None:
             cropped_audio.export(cropped_buffer, format="wav")
             cropped_buffer.seek(0)
 
-            # Send the cropped result to the backend only if its duration is less than 10 seconds.
-            if duration < 10:
-                files = {"audio": ("cropped.wav", cropped_buffer, "audio/wav")}
-                try:
-                    logger.info("Sending cropped audio to backend", extra={"duration": duration})
-                    response = requests.post("http://backend:8000/detector/get_audio_class", files=files)
-                    logger.info("Received response from backend", extra={"status_code": response.status_code, "response_text": response.text})
-                    if response.ok:
-                        result_str = response.text
-                        st.write("Detected Audio Class:", result_str)
-                    else:
-                        st.error("Backend error: " + response.text)
-                        logger.error("Backend returned an error", extra={"status_code": response.status_code, "response_text": response.text})
-                except Exception as e:
-                    st.error("Error sending request to backend: " + str(e))
-                    logger.exception("Exception while sending request to backend")
-            else:
-                st.info("Cropped audio is 10 seconds long and was not sent to the backend.")
+            files = {"audio": ("cropped.wav", cropped_buffer, "audio/wav")}
+            try:
+                logger.info("Sending cropped audio to backend", extra={"duration": duration})
+                response = requests.post("http://backend:8000/detector/get_audio_class", files=files)
+                logger.info("Received response from backend",
+                            extra={"status_code": response.status_code, "response_text": response.text})
+                if response.ok:
+                    response_data = response.json()
+                    result_str = response_data.get("audio_class")
+                    logger.info("result received successfully", extra={"result": result_str})
+                    if result_str == "healthy":
+                        st.success("Detected Audio Class: Healthy")
+                    elif result_str == "unhealthy":
+                        st.error("Detected Audio Class: Unhealthy")
+                    else:  # Error during audio recording
+                        st.warning("Error during audio recording.")
+                else:
+                    st.error("Backend error: " + response.text)
+                    logger.error("Backend returned an error",
+                                 extra={"status_code": response.status_code, "response_text": response.text})
+            except Exception as e:
+                st.error("Error sending request to backend: " + str(e))
+                logger.exception("Exception while sending request to backend")
+
+            # If the user selects more than 10 seconds, limit to the first 10 seconds.
+            if duration > 10:
+                st.warning("Warning: Selection is longer than 10 seconds. Limiting to the first 10 seconds.")
+                logger.warning("Selection longer than 10 seconds; limiting to 10 seconds",
+                               extra={"original_duration": duration})
+                end = start + 10
+                duration = 10
