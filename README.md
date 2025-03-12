@@ -4,7 +4,7 @@
 
 The Heart Disease Detector is a web application that utilizes a trained AST transformer for classifying heart auscultation sounds, enabling early detection of heart conditions. Built with FastAPI, Streamlit, RabbitMQ, and PostgreSQL, it provides an efficient and interactive platform for healthcare professionals.
 
-## Preparing environment and docker
+## Preparing environment
 
 + Change .env.example name to .env.prod
 
