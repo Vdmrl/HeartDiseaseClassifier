@@ -78,11 +78,13 @@ if uploaded_file is not None:
                     result_str = response_data.get("audio_class")
                     logger.info("result received successfully", extra={"result": result_str})
                     if result_str == "healthy":
-                        st.success("Detected Audio Class: Healthy")
+                        st.success("Analysis Result: Normal heart sounds detected.")
                     elif result_str == "unhealthy":
-                        st.error("Detected Audio Class: Unhealthy")
+                        st.error(
+                            "Analysis Result: Abnormal heart sounds detected. Please consult a healthcare professional.")
                     else:  # Error during audio recording
-                        st.warning("Error during audio recording.")
+                        st.warning(
+                            "Error during audio recording. Please try to re-record or select a different fragment.")
                 else:
                     st.error("Backend error: " + response.text)
                     logger.error("Backend returned an error",
@@ -98,3 +100,13 @@ if uploaded_file is not None:
                                extra={"original_duration": duration})
                 end = start + 10
                 duration = 10
+
+# Disclaimer in small, gray font
+st.markdown(
+    """
+    <p style='font-size: 0.8em; color: grey; text-align: center;'>
+        Disclaimer: The results provided by this classifier are not completely accurate and should not be considered a substitute for professional medical advice. Please consult a doctor for any health concerns.
+    </p>
+    """,
+    unsafe_allow_html=True
+)
