@@ -18,15 +18,16 @@ class Settings(BaseSettings):
 
     # dev
     @property
-    def DATABASE_URL_aiomysql(self):  # async
-        # DSN
-        return f"mysql+aiomysql://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}/{self.DB_NAME}"
+    def DATABASE_URL_asyncpg(self) -> str:  # async
+        # DSN for PostgreSQL using asyncpg
+        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}/{self.DB_NAME}"
 
     # test
     @property
-    def TEST_DATABASE_URL_aiomysql(self):  # async
-        # DSN
-        return f"mysql+aiomysql://{self.DB_TEST_USER}:{self.DB_TEST_PASS}@{self.DB_TEST_HOST}/{self.DB_TEST_NAME}"
+    def TEST_DATABASE_URL_asyncpg(self) -> str:  # async
+        # DSN for PostgreSQL using asyncpg
+        return f"postgresql+asyncpg://{self.DB_TEST_USER}:{self.DB_TEST_PASS}@{self.DB_TEST_HOST}/{self.DB_TEST_NAME}"
+
     model_config = SettingsConfigDict()
 
 

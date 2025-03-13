@@ -27,19 +27,20 @@ services:
     container_name: backend
     depends_on:
       - redis
-    #  - "db"
+      - db
 
-  #db: # in production replace db service with real database and models with reflection
-  #  image: postgresql
-  #  container_name: db_app
-  #  restart: always
-  #  environment:
-  #    - MYSQL_ROOT_PASSWORD=secret
-  #    - MYSQL_DATABASE=startupsupport
-  #  ports:
-  #    - "5400:8000"
-  #  expose:
-  #    - "8000"
+  db:
+    image: postgres:13
+    container_name: db_app
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: postgres_db
+    ports:
+      - "5432:5432"
+    networks:
+      - app
 
   redis:
     image: redis:alpine

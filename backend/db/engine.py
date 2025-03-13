@@ -9,12 +9,12 @@ from backend.db.config import settings
 
 
 async_engine = create_async_engine(
-    url=settings.DATABASE_URL_aiomysql,
+    url=settings.DATABASE_URL_asyncpg,
     echo=False,
 )
 
 test_async_engine = create_async_engine(
-    url=settings.TEST_DATABASE_URL_aiomysql,
+    url=settings.TEST_DATABASE_URL_asyncpg,
     echo=False,
 )
 
