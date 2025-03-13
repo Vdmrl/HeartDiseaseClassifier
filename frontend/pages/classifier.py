@@ -46,7 +46,7 @@ if uploaded_file is not None:
         audio.export(out_audio, format="wav")
         out_audio.seek(0)
 
-        st.subheader("2. Crop audio sample (up to 10 seconds)")
+        st.subheader(f"2. Crop audio sample (up to {TIME_LIMIT_SECONDS} seconds)")
         result = audix(
             out_audio,
             wavesurfer_options=WaveSurferOptions(
@@ -61,7 +61,7 @@ if uploaded_file is not None:
             logger.info("Audio crop selected", extra={"start": start, "end": end, "duration": duration})
 
             # Crop the audio (pydub works in milliseconds)
-            cropped_audio = audio[start * 1000: end * 1000]
+            cropped_audio = audio[int(start * 1000): int(end * 1000)]
 
             # Export cropped audio to a BytesIO buffer
             cropped_buffer = io.BytesIO()
@@ -96,8 +96,8 @@ if uploaded_file is not None:
 
             # If the user selects more than TIME_LIMIT_SECONDS seconds, limit to the first TIME_LIMIT_SECONDS seconds.
             if duration > TIME_LIMIT_SECONDS:
-                st.warning("Warning: Selection is longer than 10 seconds. Limiting to the first 10 seconds.")
-                logger.warning("Selection longer than 10 seconds; limiting to 10 seconds",
+                st.warning(f"Warning: Selection is longer than {TIME_LIMIT_SECONDS} seconds. Limiting to the first {TIME_LIMIT_SECONDS} seconds.")
+                logger.warning(f"Selection longer than {TIME_LIMIT_SECONDS} seconds; limiting to {TIME_LIMIT_SECONDS} seconds",
                                extra={"original_duration": duration})
                 end = start + TIME_LIMIT_SECONDS
                 duration = TIME_LIMIT_SECONDS
