@@ -7,6 +7,7 @@ from pydub import AudioSegment
 from logger import logger
 
 # Set target frame rate
+TIME_LIMIT_SECONDS = 30
 FRAME_RATE = 16000
 
 st.title("Heart Disease Classifier")
@@ -93,15 +94,15 @@ if uploaded_file is not None:
                 st.error("Error sending request to backend: " + str(e))
                 logger.exception("Exception while sending request to backend")
 
-            # If the user selects more than 10 seconds, limit to the first 10 seconds.
-            if duration > 10:
+            # If the user selects more than TIME_LIMIT_SECONDS seconds, limit to the first TIME_LIMIT_SECONDS seconds.
+            if duration > TIME_LIMIT_SECONDS:
                 st.warning("Warning: Selection is longer than 10 seconds. Limiting to the first 10 seconds.")
                 logger.warning("Selection longer than 10 seconds; limiting to 10 seconds",
                                extra={"original_duration": duration})
-                end = start + 10
-                duration = 10
+                end = start + TIME_LIMIT_SECONDS
+                duration = TIME_LIMIT_SECONDS
 
-# Disclaimer in small, gray font
+# Disclaimer
 st.markdown(
     """
     <p style='font-size: 0.8em; color: grey; text-align: center;'>

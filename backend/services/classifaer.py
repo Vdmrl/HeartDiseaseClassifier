@@ -6,7 +6,7 @@ import librosa
 from transformers import AutoFeatureExtractor, AutoModelForAudioClassification
 
 MODEL_CHECKPOINT = "Vladimirlv/ast-finetuned-audioset-10-10-0.4593-heart-sounds"
-TIME_LIMIT_SECONDS = 10
+TIME_LIMIT_SECONDS = 30
 SAMPLE_RATE = 16000
 
 # Configure logging for this module
