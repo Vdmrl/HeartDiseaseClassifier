@@ -4,4 +4,4 @@ from api.routes import detector
 
 
 api_router = APIRouter()
-api_router.include_router(detector.router, prefix="/detector", tags=["detector"])
+api_router.include_router(detector.router)

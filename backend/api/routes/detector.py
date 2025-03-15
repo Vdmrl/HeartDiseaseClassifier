@@ -1,37 +1,57 @@
-from fastapi import APIRouter, File, UploadFile, status, Request, Depends
-from fastapi_cache.decorator import cache
+# backend/api/detector.py
 
-from redis import asyncio as aioredis
-
+import base64
+from fastapi import APIRouter, File, UploadFile, status, HTTPException
 from logger import logger
+from services.classifier_worker import classify_audio_task  # Celery task for classification
+from schemas.detector import (
+    AudioClassResponse,
+    ClassificationResult,
+)
+from celery.result import AsyncResult
+from celery_app import celery_app  # Import the Celery app instance
 
-from schemas.detector import AudioClassResult, ClassificationResult
-
-from services.classifaer import Classifier
-
-router = APIRouter()
-
-
-def get_classifier(request: Request) -> Classifier:
-    # Dependency that retrieves the classifier from app.state
-    return request.app.state.classifier
-
+router = APIRouter(prefix="/detector", tags=["Detector"])
 
 @router.post(
-    "/get_audio_class",
-    summary="return class of sent audio",
-    status_code=status.HTTP_200_OK,
-    response_model=AudioClassResult,
+    "/classify_audio",
+    summary="Enqueue audio classification task",
+    status_code=status.HTTP_202_ACCEPTED,
 )
-@cache(expire=3600)  # 1 hour cache
-async def get_audio_class(
-        audio: UploadFile = File(...),
-        classifier: Classifier = Depends(get_classifier)
+async def classify_audio(
+    audio: UploadFile = File(...),
 ):
-    logger.info("Received request for audio classification")
-    # Read audio file bytes
+    """
+    Accepts an audio file, encodes it as base64, enqueues a Celery task,
+    and returns the task ID.
+    """
+    logger.info("Received asynchronous classification request")
     audio_bytes = await audio.read()
-    # Classify the audio and get predicted class
-    audio_class = classifier.classify_audio(audio_bytes)
-    logger.info("Audio classified successfully", extra={"class": audio_class})
-    return AudioClassResult(audio_class=audio_class)
+    audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+    task = classify_audio_task.delay(audio_base64)
+    logger.info(f"Task enqueued with ID: {task.id}")
+    return {"task_id": task.id}
+
+
+@router.get(
+    "/classify_audio/result/{task_id}",
+    response_model=AudioClassResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_classification_result(task_id: str):
+    """
+    Retrieves the classification result for a given task ID from Celery.
+    If the task is not yet ready, a 404 error is raised.
+    """
+    result = AsyncResult(task_id, app=celery_app)
+    if not result.ready():
+        raise HTTPException(
+            status_code=404,
+            detail="Result not found or task still processing",
+        )
+    try:
+        # Ensure result is lower-case to match our enum values
+        audio_class_enum = ClassificationResult(result.get().lower())
+    except ValueError:
+        audio_class_enum = ClassificationResult.error
+    return AudioClassResponse(task_id=task_id, audio_class=audio_class_enum)

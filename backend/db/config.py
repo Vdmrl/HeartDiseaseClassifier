@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     DB_TEST_PASS: str
     DB_TEST_NAME: str
 
+    CELERY_BROKER_URL: str
+    CELERY_RESULT_BACKEND: str
+
     # dev
     @property
     def DATABASE_URL_asyncpg(self) -> str:  # async

@@ -10,20 +10,16 @@ from redis import asyncio as aioredis
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 
-from services.classifaer import Classifier
+from services.classifier import Classifier
+from types import SimpleNamespace
 
 from api.main import api_router
 
 from logger import logger
 
-from services.classifaer import Classifier
-from types import SimpleNamespace
-
-
 app = FastAPI(title="heart disease detector")
 app.state = SimpleNamespace()
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
 
 # middleware
 origins = [
@@ -48,6 +44,7 @@ app.add_middleware(
     ],
 )
 
+
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
     start_time = time.time()
@@ -59,6 +56,7 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
+
 # cache
 
 @app.on_event("startup")
@@ -66,11 +64,13 @@ async def startup():
     logger.info("Starting redis cache...")
     redis = aioredis.from_url("redis://redis:6379", encoding="utf8", decode_responses=True)
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    app.state.redis = redis  # save redis client for later use
     logger.info("Redis cache started successfully")
 
     logger.info("Initializing classifier model...")
     app.state.classifier = Classifier()
     logger.info("Classifier model Initializing successfully")
+
 
 # routers
 app.include_router(api_router)

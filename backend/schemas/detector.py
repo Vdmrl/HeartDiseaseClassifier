@@ -1,15 +1,18 @@
 from enum import Enum
-from pydantic import BaseModel, field_validator
-import base64
+from pydantic import BaseModel
 
-
-# Enum for classfication results
 class ClassificationResult(str, Enum):
-    healty = "healthy"
-    unhealty = "unhealthy"
+    healthy = "healthy"
+    unhealthy = "unhealthy"
     error = "artifact"
 
-
-# Pydantic model for the response
 class AudioClassResult(BaseModel):
+    audio_class: ClassificationResult
+
+class ClassificationWebhookPayload(BaseModel):
+    task_id: str
+    audio_class: ClassificationResult
+
+class AudioClassResponse(BaseModel):
+    task_id: str
     audio_class: ClassificationResult
