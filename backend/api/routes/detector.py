@@ -1,5 +1,3 @@
-# backend/api/detector.py
-
 import base64
 from fastapi import APIRouter, File, UploadFile, status, HTTPException
 from logger import logger
@@ -50,7 +48,6 @@ async def get_classification_result(task_id: str):
             detail="Result not found or task still processing",
         )
     try:
-        # Ensure result is lower-case to match our enum values
         audio_class_enum = ClassificationResult(result.get().lower())
     except ValueError:
         audio_class_enum = ClassificationResult.error

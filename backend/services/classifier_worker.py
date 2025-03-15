@@ -1,5 +1,3 @@
-# backend/services/classifier_worker.py
-
 import base64
 import logging
 from celery import Celery
