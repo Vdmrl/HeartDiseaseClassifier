@@ -1,13 +1,12 @@
 import base64
 from fastapi import APIRouter, File, UploadFile, status, HTTPException
 from logger import logger
-from services.classifier_worker import classify_audio_task  # Celery task for classification
 from schemas.detector import (
     AudioClassResponse,
     ClassificationResult,
 )
 from celery.result import AsyncResult
-from celery_app import celery_app  # Import the Celery app instance
+from celery_app import celery_app
 
 router = APIRouter(prefix="/detector", tags=["Detector"])
 
@@ -16,9 +15,7 @@ router = APIRouter(prefix="/detector", tags=["Detector"])
     summary="Enqueue audio classification task",
     status_code=status.HTTP_202_ACCEPTED,
 )
-async def classify_audio(
-    audio: UploadFile = File(...),
-):
+async def classify_audio(audio: UploadFile = File(...)):
     """
     Accepts an audio file, encodes it as base64, enqueues a Celery task,
     and returns the task ID.
@@ -26,10 +23,9 @@ async def classify_audio(
     logger.info("Received asynchronous classification request")
     audio_bytes = await audio.read()
     audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
-    task = classify_audio_task.delay(audio_base64)
+    task = celery_app.send_task("classify_audio_task", args=[audio_base64])
     logger.info(f"Task enqueued with ID: {task.id}")
     return {"task_id": task.id}
-
 
 @router.get(
     "/classify_audio/result/{task_id}",

@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "model"
+version = "0.1.0"
+description = ""
+authors = ["Vdmrl <vvluzin2004@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+ffmpeg = "^1.4"
+llvmlite = "^0.44.0"
+librosa = "^0.11.0"
+transformers = "^4.49.0"
+pydantic = "^2.10.6"
+pydantic-settings = "^2.8.1"
+celery = "^5.4.0"
+torch = "^2.6.0"
+python-json-logger = "^3.3.0"
+redis = "^5.2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

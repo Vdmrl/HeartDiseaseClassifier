@@ -5,20 +5,18 @@ import time
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-# from prometheus_fastapi_instrumentator import Instrumentator
 from redis import asyncio as aioredis
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 
-from services.classifier import Classifier
-from types import SimpleNamespace
-
 from api.main import api_router
+from logger import logger
+
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from logger import logger
 
 app = FastAPI(title="heart disease detector")
-app.state = SimpleNamespace()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # middleware
@@ -64,12 +62,7 @@ async def startup():
     logger.info("Starting redis cache...")
     redis = aioredis.from_url("redis://redis:6379", encoding="utf8", decode_responses=True)
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-    app.state.redis = redis  # save redis client for later use
     logger.info("Redis cache started successfully")
-
-    logger.info("Initializing classifier model...")
-    app.state.classifier = Classifier()
-    logger.info("Classifier model Initializing successfully")
 
 
 # routers

@@ -1,8 +1,8 @@
 from celery import Celery
-from db.config import settings
+from config import settings
 
 celery_app = Celery(
-    "backend_client",
+    "model_worker",
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND,
 )
@@ -14,3 +14,9 @@ celery_app.conf.update(
     timezone="UTC",
     enable_utc=True,
 )
+
+# Import the ML worker task
+celery_app.conf.imports = ["services.classifier_worker"]
+
+if __name__ == '__main__':
+    celery_app.start()

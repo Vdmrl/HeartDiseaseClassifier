@@ -29,6 +29,21 @@
         - redis
         - db
 
+    model_worker:
+      build: model
+      command: celery -A celery_app worker --loglevel=info
+      volumes:
+        - ./model:/app
+      depends_on:
+        - rabbitmq
+        - redis
+        - db
+      env_file:
+        - .env.prod
+      networks:
+        - app
+      container_name: model_worker
+
     db:
       image: postgres:13
       container_name: db_app
@@ -62,20 +77,6 @@
         - "15672:15672"
       networks:
         - app
-
-    celery_worker:
-      build: ./backend
-      command: celery -A celery_app worker --loglevel=info
-      depends_on:
-        - backend
-        - rabbitmq
-        - redis
-        - db
-      env_file:
-        - .env.prod
-      networks:
-        - app
-      container_name: celery_worker
 
     nginx:
       image: nginx:latest
