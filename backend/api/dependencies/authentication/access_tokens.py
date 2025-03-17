@@ -10,3 +10,4 @@ async def get_access_token_db(
         session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     yield SQLAlchemyAccessTokenDatabase(session, AccessToken)
+
