@@ -1,10 +1,9 @@
-import json
 import logging
 from datetime import datetime
 
 from pythonjsonlogger import jsonlogger
 
-from db.config import settings
+from core.db.config import settings
 
 
 logger = logging.getLogger()

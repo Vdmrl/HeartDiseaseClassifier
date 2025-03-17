@@ -1,14 +1,10 @@
-from fastapi import Depends
-
-from db.config import settings
+from core.db.config import settings
 
 from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from fastapi_users.db import SQLAlchemyUserDatabase
-
-from db.base import Base
+from core.db.base import Base
 
 async_engine = create_async_engine(
     url=settings.DATABASE_URL_asyncpg,

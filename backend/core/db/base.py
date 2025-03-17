@@ -1,6 +1,6 @@
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
 from sqlalchemy import MetaData
-from db.config import settings
+from core.db.config import settings
 
 def camel_case_to_snake_case(input_str: str) -> str:
     chars = []

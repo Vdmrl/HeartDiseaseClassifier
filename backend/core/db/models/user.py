@@ -2,8 +2,8 @@ from collections.abc import AsyncGenerator
 
 from sqlalchemy.orm import Mapped
 from fastapi_users.db import SQLAlchemyBaseUserTable
-from db.engine import Base
-from db.engine import AsyncSession, get_async_session, SQLAlchemyUserDatabase, get_test_async_session
+from core.engine import Base
+from core.engine import AsyncSession, get_async_session, SQLAlchemyUserDatabase, get_test_async_session
 from fastapi import Depends
 
 
