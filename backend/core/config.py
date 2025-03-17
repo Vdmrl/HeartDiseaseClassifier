@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     CELERY_BROKER_URL: str
     CELERY_RESULT_BACKEND: str
 
+    ACCESS_TOKEN_LIFETIME_SECONDS: int
+
     # dev
     @property
     def DATABASE_URL_asyncpg(self) -> str:  # async
