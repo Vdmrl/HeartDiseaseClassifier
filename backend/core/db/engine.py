@@ -1,4 +1,4 @@
-from core.db.config import settings
+from core.config import settings
 
 from collections.abc import AsyncGenerator
 

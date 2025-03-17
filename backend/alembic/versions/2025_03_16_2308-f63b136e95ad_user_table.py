@@ -1,4 +1,4 @@
-"""your_migration_message
+"""user_table
 
 Revision ID: f63b136e95ad
 Revises: 

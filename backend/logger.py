@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pythonjsonlogger import jsonlogger
 
-from core.db.config import settings
+from core.config import settings
 
 
 logger = logging.getLogger()

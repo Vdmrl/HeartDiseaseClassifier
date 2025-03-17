@@ -1,10 +1,10 @@
-from collections.abc import AsyncGenerator
-
 from sqlalchemy.orm import Mapped
-from fastapi_users.db import SQLAlchemyBaseUserTable
-from core.engine import Base
-from core.engine import AsyncSession, get_async_session, SQLAlchemyUserDatabase, get_test_async_session
+from fastapi_users.db import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
+from core.db.engine import Base
+from core.db.engine import get_async_session, get_test_async_session
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
 
 
 class User(Base, SQLAlchemyBaseUserTable[int]):

@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 load_dotenv("../.env.prod")
 
-from core.db.config import settings
+from core.config import settings
 from core.db.base import Base
 from core.db.models import user # noqa
 

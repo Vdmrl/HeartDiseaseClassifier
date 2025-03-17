@@ -1,5 +1,5 @@
 from celery import Celery
-from core.db.config import settings
+from core.config import settings
 
 celery_app = Celery(
     "backend_client",
