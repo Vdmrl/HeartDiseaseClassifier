@@ -1,16 +1,17 @@
 from fastapi_users import schemas
+from typing import Optional
 
 
 class UserRead(schemas.BaseUser[int]):
-    age: int
+    age: Optional[int] = None
     pass
 
 
 class UserCreate(schemas.BaseUserCreate):
-    age: int
+    age: Optional[int] = None
     pass
 
 
 class UserUpdate(schemas.BaseUserUpdate):
-    age: int
+    age: Optional[int] = None
     pass
