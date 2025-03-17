@@ -8,7 +8,7 @@ from fastapi_users.authentication.strategy.db import (
 from core.db.models import AccessToken
 from api.dependencies.authentication.access_tokens import get_access_token_db
 
-from core.config import Settings
+from core.config import settings
 
 
 def get_database_strategy(
@@ -17,4 +17,4 @@ def get_database_strategy(
             Depends(get_access_token_db)
         ]
 ) -> DatabaseStrategy:
-    return DatabaseStrategy(database=access_token_db, lifetime_seconds=Settings.ACCESS_TOKEN_LIFETIME_SECONDS)
+    return DatabaseStrategy(database=access_token_db, lifetime_seconds=settings.ACCESS_TOKEN_LIFETIME_SECONDS)
