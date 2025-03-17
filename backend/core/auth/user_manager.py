@@ -16,14 +16,14 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     verification_token_secret = settings.VERIFICATION_TOKEN_SECRET
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
-        logger.warning("User has registered.", args=[user.id])
+        logger.warning("User has registered.", extra={"user_id": user.id})
 
     async def on_after_forgot_password(
             self, user: User, token: str, request: Optional[Request] = None
     ):
-        logger.warning("User has forgot their password. Reset token.", args=[user.id, token])
+        logger.warning("User has forgot their password. Reset token.", extra={"user_id": user.id, "token": token})
 
     async def on_after_request_verify(
             self, user: User, token: str, request: Optional[Request] = None
     ):
-        logger.warning("Verification requested for user. Verification token.", args=[user.id, token])
+        logger.warning("Verification requested for user. Verification token.", extra={"user_id": user.id, "token": token})
