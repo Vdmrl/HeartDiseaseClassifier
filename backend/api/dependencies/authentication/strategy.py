@@ -6,7 +6,7 @@ from fastapi_users.authentication.strategy.db import (
 )
 
 from core.db.models import AccessToken
-from api.dependencies.access_tokens import get_access_token_db
+from api.dependencies.authentication.access_tokens import get_access_token_db
 
 from core.config import Settings
 
