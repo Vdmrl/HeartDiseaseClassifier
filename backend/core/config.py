@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     CELERY_RESULT_BACKEND: str
 
     ACCESS_TOKEN_LIFETIME_SECONDS: int
+    RESET_PASSWORD_TOKEN_SECRET: str
+    VERIFICATION_TOKEN_SECRET: str
 
     # dev
     @property
