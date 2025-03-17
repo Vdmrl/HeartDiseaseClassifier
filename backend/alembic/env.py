@@ -13,8 +13,7 @@ from dotenv import load_dotenv
 load_dotenv("../.env.prod")
 
 from core.config import settings
-from core.db.base import Base
-from core.db.models import user # noqa
+from core.db.models import Base # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

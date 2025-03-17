@@ -8,7 +8,7 @@ from sqlalchemy import ForeignKey
 
 from sqlalchemy.orm import Mapped, mapped_column
 
-from core.db.base import Base
+from core.db.models.base import Base
 from core.db.engine import get_async_session
 
 from sqlalchemy.ext.asyncio import AsyncSession

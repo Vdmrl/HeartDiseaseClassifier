@@ -4,7 +4,7 @@ from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from core.db.base import Base
+from core.db.models.base import Base
 
 async_engine = create_async_engine(
     url=settings.DATABASE_URL_asyncpg,
