@@ -48,6 +48,8 @@
       image: postgres:13
       container_name: db_app
       restart: always
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
       environment:
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: secret
@@ -115,8 +117,10 @@
   networks:
     app:
       driver: bridge
+      name: heart-app-network
 
-  #volumes:
+  volumes:
+    postgres_data:
   #  grafanadata:
   #  prometheusdata:
 

@@ -14,4 +14,4 @@ ENV PYTHONPATH=/app
 
 ENTRYPOINT ["streamlit","run"]
 
-CMD ["pages/classifier.py"]
+CMD ["app.py"]

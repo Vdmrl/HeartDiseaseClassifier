@@ -43,8 +43,8 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id', 'token', name=op.f('pk_access_tokens'))
     )
     op.create_index(op.f('ix_access_tokens_created_at'), 'access_tokens', ['created_at'], unique=False)
-    op.drop_table('celery_taskmeta')
-    op.drop_table('celery_tasksetmeta')
+    op.execute("DROP TABLE IF EXISTS celery_taskmeta") #
+    op.execute("DROP TABLE IF EXISTS celery_tasksetmeta") #
     # ### end Alembic commands ###
 
 

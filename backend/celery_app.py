@@ -5,6 +5,7 @@ celery_app = Celery(
     "backend_client",
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND,
+    task_time_limit=3600
 )
 
 celery_app.conf.update(

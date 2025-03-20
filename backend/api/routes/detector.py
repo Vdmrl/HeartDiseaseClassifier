@@ -8,7 +8,7 @@ from schemas.detector import (
 from celery.result import AsyncResult
 from celery_app import celery_app
 from core.db.models import User
-from api.routes.fastapi_users import current_user
+from api.routes.fastapi_users import current_active_user
 
 router = APIRouter(prefix="/detector", tags=["Detector"])
 
@@ -34,7 +34,7 @@ async def classify_audio(audio: UploadFile = File(...), user: User = Depends(cur
     response_model=AudioClassResponse,
     status_code=status.HTTP_200_OK,
 )
-async def get_classification_result(task_id: str):
+async def get_classification_result(task_id: str, user: User = Depends(current_active_user)):
     """
     Retrieves the classification result for a given task ID from Celery.
     If the task is not yet ready, a 404 error is raised.
