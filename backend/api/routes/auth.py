@@ -8,7 +8,10 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 # /login
 # /logout
 router.include_router(
-    router=fastapi_users.get_auth_router(authentication_backend),
+    router=fastapi_users.get_auth_router(
+        authentication_backend,
+        requires_verification=False # TODO: Add mail verification
+    ),
 )
 
 # /register
