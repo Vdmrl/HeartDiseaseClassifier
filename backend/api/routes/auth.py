@@ -1,5 +1,5 @@
-from fastapi import APIRouter, File, UploadFile, status, HTTPException
-from api.dependencies.authentication.fastapi_users import fastapi_users
+from fastapi import APIRouter
+from api.routes.fastapi_users import fastapi_users
 from api.dependencies.authentication.backend import authentication_backend
 from schemas.user import UserRead, UserCreate
 
