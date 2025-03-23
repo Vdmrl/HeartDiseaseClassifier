@@ -49,7 +49,7 @@
       container_name: db_app
       restart: always
       volumes:
-        - postgres_database:/var/lib/postgresql/data
+        - postgres_database_volume:/var/lib/postgresql/data
       environment:
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: secret
@@ -120,7 +120,7 @@
       name: heart-app-network
 
   volumes:
-    postgres_database:
+    postgres_database_volume:
   #  grafanadata:
   #  prometheusdata:
 

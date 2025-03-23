@@ -1,5 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class ClassificationResult(str, Enum):
@@ -14,8 +15,8 @@ class AudioClassResponse(BaseModel):
 
 
 class UserResultResponse(BaseModel):
-    id: int
+    classified_at: datetime
     result: ClassificationResult
 
-    # class Config:
-    #     orm_mode = True
+    class Config:
+        from_attributes = True

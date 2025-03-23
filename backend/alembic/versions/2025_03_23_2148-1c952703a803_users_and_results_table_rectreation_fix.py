@@ -1,8 +1,8 @@
 """users and results table (rectreation fix)
 
-Revision ID: 7ee9f33c2fcd
+Revision ID: 1c952703a803
 Revises: 
-Create Date: 2025-03-23 20:21:30.509632
+Create Date: 2025-03-23 21:48:08.772733
 
 """
 from typing import Sequence, Union
@@ -13,7 +13,7 @@ import fastapi_users_db_sqlalchemy
 
 
 # revision identifiers, used by Alembic.
-revision: str = '7ee9f33c2fcd'
+revision: str = '1c952703a803'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -43,6 +43,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_access_tokens_created_at'), 'access_tokens', ['created_at'], unique=False)
     op.create_table('results',
+    sa.Column('classified_at', sa.DateTime(), nullable=False),
     sa.Column('result', sa.Enum('healthy', 'unhealthy', 'artifact', name='resultenum'), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
