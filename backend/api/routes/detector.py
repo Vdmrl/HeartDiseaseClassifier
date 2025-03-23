@@ -4,10 +4,13 @@ from logger import logger
 from schemas.detector import (
     AudioClassResponse,
     ClassificationResult,
+    UserResultResponse,
 )
+from typing import List
 from celery.result import AsyncResult
 from celery_app import celery_app
 from core.db.models import User
+from repositories.results import get_user_results, add_user_result
 from api.routes.fastapi_users import current_active_user
 
 router = APIRouter(prefix="/detector", tags=["Detector"])
@@ -33,6 +36,7 @@ async def classify_audio(audio: UploadFile = File(...), user: User = Depends(cur
     "/classify_audio/result/{task_id}",
     response_model=AudioClassResponse,
     status_code=status.HTTP_200_OK,
+    summary="get classification results"
 )
 async def get_classification_result(task_id: str, user: User = Depends(current_active_user)):
     """
@@ -47,6 +51,22 @@ async def get_classification_result(task_id: str, user: User = Depends(current_a
         )
     try:
         audio_class_enum = ClassificationResult(result.get().lower())
+        # Add the classification result to the database if classification correct
+        await add_user_result(user.id, audio_class_enum)
     except ValueError:
         audio_class_enum = ClassificationResult.error
     return AudioClassResponse(task_id=task_id, audio_class=audio_class_enum)
+
+@router.get(
+    "/results",
+    response_model=List[UserResultResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Get all user results",
+)
+async def get_user_history(user: User = Depends(current_active_user)):
+    """
+    Retrieve all results for the currently authenticated user.
+    """
+    results = await get_user_results(user.id)
+
+    return results

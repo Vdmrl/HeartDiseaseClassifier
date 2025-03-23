@@ -19,6 +19,9 @@ test_async_engine = create_async_engine(
 async_session_maker = async_sessionmaker(async_engine)
 test_async_session_maker = async_sessionmaker(test_async_engine)
 
+async_session_factory = async_sessionmaker(async_engine)
+test_async_session_factory = async_sessionmaker(test_async_engine)
+
 
 # prod
 async def create_db_and_tables():
