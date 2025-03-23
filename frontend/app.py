@@ -75,8 +75,9 @@ if not st.session_state["access_token"]:
 
 # Only load the classifier if the user is authenticated.
 if st.session_state.get("access_token"):
+    show_logout()
     try:
         run_classifier()  # Call the renamed classifier function
     except Exception as e:
         st.error(f"Error loading classifier: {e}")
-    show_logout()
+
