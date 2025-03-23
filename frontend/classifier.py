@@ -6,6 +6,7 @@ from streamlit_advanced_audio import WaveSurferOptions, audix
 from pydub import AudioSegment
 from logger import logger
 import pandas as pd
+from pytz import timezone
 
 def run_classifier():
     # Set target frame rate and time limit.
@@ -140,6 +141,19 @@ def run_classifier():
         results_json = results_response.json()
         if results_json:  # Only show expander if results exist
             df = pd.DataFrame(results_json)
+
+            df['classified_at'] = (
+                pd.to_datetime(df['classified_at'])
+                .dt.tz_localize('UTC')  # Assume original time is UTC
+                .dt.tz_convert(timezone('Europe/Moscow'))  # Convert to Moscow time
+            )
+
+            df = df.sort_values(by='classified_at', ascending=False)
+
+            df = df.head(100)
+
+            df['classified_at'] = df['classified_at'].dt.strftime('%B %d, %Y, %H:%M %Z')
+
             with st.expander("My Classification Results"):
                 st.dataframe(df)
 
