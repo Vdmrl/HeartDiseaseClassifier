@@ -5,6 +5,7 @@ import requests
 from streamlit_advanced_audio import WaveSurferOptions, audix
 from pydub import AudioSegment
 from logger import logger
+import pandas as pd
 
 def run_classifier():
     # Set target frame rate and time limit.
@@ -128,6 +129,19 @@ def run_classifier():
                 except Exception as e:
                     st.error("Error sending request to backend: " + str(e))
                     logger.exception("Exception while sending request to backend")
+
+    # Fetch and display results if any exists
+    results_response = requests.get(
+        "http://backend:8000/detector/results/",
+        headers=headers,
+        timeout=3600
+    )
+    if results_response.ok:
+        results_json = results_response.json()
+        if results_json:  # Only show expander if results exist
+            df = pd.DataFrame(results_json)
+            with st.expander("My Classification Results"):
+                st.dataframe(df)
 
     st.markdown(
         """

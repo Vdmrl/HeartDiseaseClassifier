@@ -31,7 +31,7 @@ def show_login():
             if st.button("Login"):
                 token = login(username, password)
                 st.session_state["access_token"] = token
-                st.success("Logged in successfully!")
+                # st.success("Logged in successfully!")
                 st.rerun()
     except Exception as e:
         st.error(f"Invalid email or password")
@@ -51,7 +51,7 @@ def show_registration():
         with col1:
             if st.button("Register"):
                 register(email, password, age if age > 0 else None)
-                st.success("Registered successfully! Please log in.")
+                # st.success("Registered successfully! Please log in.")
                 st.session_state["auth_mode"] = "login"
                 st.rerun()
     except Exception as e:
