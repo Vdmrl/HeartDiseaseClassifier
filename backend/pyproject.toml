@@ -24,6 +24,7 @@ psycopg2 = "^2.9.10"
 fastapi-users = {extras = ["sqlalchemy"], version = "^14.0.1"}
 asyncpg = "^0.30.0"
 alembic = "^1.15.1"
+sentry-sdk = "^2.24.0"
 
 
 [build-system]

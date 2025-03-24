@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     RESET_PASSWORD_TOKEN_SECRET: str
     VERIFICATION_TOKEN_SECRET: str
 
+    IS_USE_SENTRY_PROMETHEUS_GRAPHANA:bool
+    SENTRY_DSN:str
+
     # dev
     @property
     def DATABASE_URL_asyncpg(self) -> str:  # async

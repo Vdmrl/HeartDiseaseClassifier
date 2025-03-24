@@ -14,10 +14,35 @@ from logger import logger
 
 from prometheus_fastapi_instrumentator import Instrumentator
 
+import sentry_sdk
+
+from core.config import settings
+
 from logger import logger
 
 app = FastAPI(title="heart disease detector")
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+if settings.IS_USE_SENTRY_PROMETHEUS_GRAPHANA:
+    # sentry
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        traces_sample_rate=1.0,
+        # Set profiles_sample_rate to 1.0 to profile 100%
+        # of sampled transactions.
+        # We recommend adjusting this value in production.
+        profiles_sample_rate=1.0,
+        release="backend@latest",
+    )
+
+    # prometheus + grafana
+    instrumentator = Instrumentator(
+        should_group_status_codes=False,
+        excluded_handlers=[".*admin.*", "/metrics"]
+    )
+    instrumentator.instrument(app).expose(app)
 
 # middleware
 origins = [

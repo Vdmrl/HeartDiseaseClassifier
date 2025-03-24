@@ -149,7 +149,6 @@ def run_classifier():
             )
 
             df = df.sort_values(by='classified_at', ascending=False)
-
             df = df.head(100)
 
             df['classified_at'] = df['classified_at'].dt.strftime('%B %d, %Y, %H:%M %Z')
