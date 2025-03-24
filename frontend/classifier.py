@@ -62,7 +62,7 @@ def run_classifier():
                 start = result["selectedRegion"].get("start", 0)
                 end = result["selectedRegion"].get("end", 0)
                 duration = end - start
-                if duration > 2:
+                if duration < 2:
                     st.warning(
                         f"Warning: Selection is less than 2 seconds. length increased to 2 seconds.")
                     logger.warning("Selection less than 2 seconds allowed; limiting duration",
