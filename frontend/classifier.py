@@ -62,6 +62,16 @@ def run_classifier():
                 start = result["selectedRegion"].get("start", 0)
                 end = result["selectedRegion"].get("end", 0)
                 duration = end - start
+                if duration > 2:
+                    st.warning(
+                        f"Warning: Selection is less than 2 seconds. length increased to 2 seconds.")
+                    logger.warning("Selection less than 2 seconds allowed; limiting duration",
+                                   extra={"original_duration": duration})
+                    end = start + 2
+                    total_duration = len(audio) / 1000 - 0.1
+                    if end > total_duration:
+                        end = max(start, total_duration)
+                    duration = end - start
                 logger.info("Audio crop selected", extra={"start": start, "end": end, "duration": duration})
 
                 cropped_audio = audio[int(start * 1000): int(end * 1000)]
